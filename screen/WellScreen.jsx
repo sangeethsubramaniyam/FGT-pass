@@ -5,10 +5,10 @@ import { useNavigation } from '@react-navigation/native'
 const WellScreen = () => {
     const navigation =useNavigation();
     const signupkaro =() =>{
-        navigation.navigate("Saniya")
+        navigation.navigate("Signup")
     };
     const loginkaro =() =>{
-      navigation.navigate("Loki")
+      navigation.navigate("Login")
   };
   return (
     <View>

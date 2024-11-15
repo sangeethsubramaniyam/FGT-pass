@@ -34,7 +34,7 @@ const SignupScreen = () => {
         // Handle successful signup 
         console.log('Signup successful:', data);
         Alert.alert('Success', 'User registered successfully');
-        navigation.navigate('Loki')
+        navigation.navigate('Login')
         // Navigate to the next screen or show a success message
       } else {
         // Handle error response
