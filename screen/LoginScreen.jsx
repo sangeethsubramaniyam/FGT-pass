@@ -1,34 +1,79 @@
-import { Button, StyleSheet,Text, TextInput, View } from 'react-native'
-import React from 'react'
+import React, { useState } from 'react';
+import { Button, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import axios from 'axios';
+import { useNavigation } from '@react-navigation/native';
 
 const LoginScreen = () => {
+  const [username, setUsername] = useState('');
+  const [password, setPassword] = useState('');
+  const navigation = useNavigation();
+
+  const Handleforgot =() =>{
+    navigation.navigate("Forgot")
+};
+const HandleOtp=() =>{
+  navigation.navigate("Otp")
+};
+  // 
+  const handleLogin = async () => {
+    if (!username || !password) {
+      Alert.alert('Error', 'Please enter your username and password.');
+      return;
+    }
+  
+    try {
+      const response = await axios.post('http://10.0.2.2:3000/login', {
+        username,
+        password,
+      });
+  
+      if (response.status === 200) {
+        Alert.alert('Success', 'Login successful!', [
+          {
+            text: 'OK',
+            onPress: () => navigation.navigate('Home', { user: response.data.user }),
+          },
+        ]);
+      } else if (response.status === 401) {
+        Alert.alert('Error', 'Invalid username or password.');
+      } else {
+        Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+      }
+    } catch (error) {
+      console.error('Login error:', error);
+      Alert.alert('Error', 'An unexpected error occurred. Please try again later.');
+    }
+  };
   return (
-    <View>
- <View style={{marginTop:100}}>
- <Text style={{marginLeft:160,fontSize:19,fontWeight:800,color:'#d90368'}}>LOGIN</Text>
-     <View>
-        {/* Input fields for username, email, and password */}
-        <TextInput
-          placeholder="Username"
-         style={{backgroundColor:'#fff',width:'70%',justifyContent:'center',alignItems:'center',left:70,top:40,borderRadius:12}}
-       />
-      
-        <TextInput
-          placeholder="Password"
-          secureTextEntry
-          style={{backgroundColor:'#fff',width:'70%',justifyContent:'center',alignItems:'center',left:70,top:90,borderRadius:12}}
-        />
-        
-       {/* Signup button */}
-       <View style={{marginTop:180,width:'60%',marginLeft:87,borderRadius:20}}>
-       <Button title="LOGIN" color='#d90368'/>
-       </View>
-    </View>
-    </View>
-    </View>
-  )
-}
+    <View style={styles.container}>
+      <Text style={styles.title}>Login</Text>
+      <TextInput
+        style={styles.input}
+        placeholder="Username"
+        onChangeText={setUsername} 
 
-export default LoginScreen
+        value={username}
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        onChangeText={setPassword}
+        value={password}
+      />
+      <Button title="Login" onPress={handleLogin} />
+      <Text style={{margin:20,fontWeight:600}} onPress={Handleforgot}>Forgot password?</Text>
+      <Text onPress={HandleOtp}>Login with phone number</Text>
 
-const styles = StyleSheet.create({})
+       <Text onPress={()=>navigation.navigate('Media')} style={{margin:50}}  >Login with Google</Text>
+
+    </View>
+  );
+};
+
+const styles = StyleSheet.create({ 
+
+  
+});
+
+export default LoginScreen;

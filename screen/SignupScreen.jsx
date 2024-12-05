@@ -1,92 +1,111 @@
 
-import { useNavigation } from '@react-navigation/native';
-import axios from 'axios';
+//    this also aroogara
 import React, { useState } from 'react';
-import { View,Text, TextInput, Button,Alert } from 'react-native';
+import { Button, StyleSheet, Text, TextInput, View, Alert } from 'react-native';
+import axios from 'axios';
 
 const SignupScreen = () => {
-  const navigation =useNavigation();
   const [username, setUsername] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-
-  const handleSignup 
- = async () => {
-  if (!username || !email || !password) {
-    Alert.alert('Error', 'Please fill all the fields.');
-    return; // Stop further execution if any field is empty
+  const [error, setError] = useState('');
+  const handleSignup = async () => {
+    if (!username || !email || !password) 
+ {
+      setError('Error', 'Please fill in all fields.');
+      return;
+    }
+  //
+  if (!username || username.length < 3 || username.length > 30) {
+    setError('Error', ' Username must be between 3 and 30 characters.');
+    return ;
   }
-
+  if (!email || !/\S+@\S+\.\S+/.test(email)) {
+    setError('Error', ' invalid address.');
+    return;
+  }
+  if (!password || password.length < 6) {
+    Alert.alert('Error', 'Password must be at least 6 characters long.');
+    return;
+  }
     try {
-      const response = await axios.post('http://10.0.2.2:3000/signup',   
- { // Ensure correct URL
+      const response = await axios.post('http://10.0.2.2:3000/signup', {
         username,
         email,
         password,
       });
 
-      // const data = await response.json();
-      const data = response.data;
-
-      if (response.status === 200) //0k
-      
-      {
-        // Handle successful signup 
-        console.log('Signup successful:', data);
-        Alert.alert('Success', 'User registered successfully');
-        navigation.navigate('Login')
-        // Navigate to the next screen or show a success message
+      if (response.status === 200) {
+        Alert.alert('Success', 'Users registered successfully!');
       } else {
-        // Handle error response
-        console.error('Signup failed:', data.error);
-        Alert.alert('Error', 'Something went wrong. Please try again.');
-
-        // Display an error message to the user
+        Alert.alert('Error', 'Registration failed. Please try again later.');
       }
     } catch (error) {
-      console.error('Error:', error.message);
-      Alert.alert('Error', 'Something went wrong. Please try again.');
-      // Display an error message to the user
+      console.error('Signup error:', error);
+      Alert.alert('Error', 'An error occurred. Please try again later.');
     }
   };
 
+
   return (
-      <View style={{marginTop:100}}>
-     <Text style={{marginLeft:120,fontSize:19,fontWeight:800,color:'#d90368'}}>CREATE A ACCOUNT </Text>
-        <View>
-           {/* Input fields for username, email, and password */}
-           <TextInput
-             placeholder="Username"
-           value={username}
-           required
-             onChangeText={setUsername}
-            style={{backgroundColor:'#fff',width:'70%',justifyContent:'center',alignItems:'center',left:70,top:40,borderRadius:12}}
-          />
-          <TextInput
-            placeholder="Email"
-             value={email}
-             onChangeText={setEmail}
-             keyboardType="email-address"
-             required
-             style={{backgroundColor:'#fff',width:'70%',justifyContent:'center',alignItems:'center',left:70,top:60,borderRadius:12}}
-           />
-           <TextInput
-             placeholder="Password"
-             value={password}
-             required
-             onChangeText={setPassword}
-             secureTextEntry
-             style={{backgroundColor:'#fff',width:'70%',justifyContent:'center',alignItems:'center',left:70,top:90,borderRadius:12}}
-           />
-           
-          {/* Signup button */}
-          <View style={{marginTop:180,width:'60%',marginLeft:87,borderRadius:20}}>
-          <Button title="Sign Up" color='#d90368' onPress={ handleSignup }/>
-          </View>
-       </View>
-       </View>
+    <View style={styles.container}>
+      <Text style={styles.title}>Signup</Text>
+      <TextInput
+        style={[styles.input,error &&styles.errorInput]}
+        placeholder="Username"
+        onChangeText={setUsername}
+
+        value={username}
+      />
+       {error && (
+        <Text style={styles.errorText}>{error}</Text>
+      )}
+
+      <TextInput
+        style={styles.input}
+        placeholder="Email"
+        onChangeText={setEmail}
+        value={email}
+        keyboardType="email-address" 
+ // Set keyboard type for email address
+      />
+      <TextInput
+        style={styles.input}
+        placeholder="Password"
+        secureTextEntry
+        onChangeText={setPassword}
+        value={password}
+      />
+      <Button title="Signup" 
+ onPress={handleSignup} />
+    </View>
   );
 };
 
-export default   
- SignupScreen;
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    padding: 20,
+  },
+  title: 
+ {
+    fontSize: 24,
+    marginBottom: 20,
+  },
+  input: {
+    height:
+ 40,
+    margin: 12,
+    padding: 8,
+    fontSize: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: '#ccc',
+  },
+  errorInput: {
+    borderColor: 'red', // Red border if there is an error
+  },
+});
+
+export default SignupScreen;
